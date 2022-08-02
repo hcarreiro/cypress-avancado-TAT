@@ -132,8 +132,8 @@ describe('Hacker Stories', () => {
         cy.intercept(
           'GET',
           '**/search**',
-          // Envia um erro 404 simulando uma falha de rede
-          { statusCode: 404 }
+          // Envia um erro simulando uma falha de rede
+          { forceNetworkError: true }
         ).as('getNetworkFailure')
 
         // Acesso a home que já por padrão dá um GET por React e assim já temos um GET com um search
