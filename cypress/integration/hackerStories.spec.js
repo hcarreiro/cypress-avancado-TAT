@@ -73,11 +73,19 @@ describe('Hacker Stories', () => {
       // Nova implementação
       cy.wait('@getNewTermStories')
 
+      // Validamos e o dado contido no local storage do navegador é o último dado informado na pesquisa
+      cy.getLocalStorage('search')
+        .should('be.equal', newTerm)
+
       cy.get(`button:contains(${initialTerm})`)
         .should('be.visible')
         .click()
 
       cy.wait('@getStories')
+
+      // Validamos e o dado contido no local storage do navegador é o último dado informado na pesquisa
+      cy.getLocalStorage('search')
+        .should('be.equal', initialTerm)
 
       cy.get('.item').should('have.length', 20)
       cy.get('.item')
@@ -338,6 +346,10 @@ describe('Hacker Stories', () => {
 
       cy.wait('@getStories')
 
+      // Validamos e o dado contido no local storage do navegador é o último dado informado na pesquisa
+      cy.getLocalStorage('search')
+        .should('be.equal', newTerm)
+
       cy.get('.item').should('have.length', 2)
       cy.get(`button:contains(${initialTerm})`)
         .should('be.visible')
@@ -346,15 +358,21 @@ describe('Hacker Stories', () => {
       // TESTE QUE NÃO REFLETE A AÇÃO DE UM USUÁRIO
       it('types and clicks the submit button', () => {
         cy.get('#search')
-          .should('be.visible')
-          .type(newTerm)
-
-        // Em um cenário de simulação de usuário ELE NÃO REFLETE A REALIDADE pois um usuário não submete um formulário.
-        cy.get('form')
-          .should('be.visible')
-          .submit()
-
-        cy.get('.item').should('have.length', 2)
+            .should('be.visible')
+            .type(newTerm)
+          cy.contains('Submit')
+            .should('be.visible')
+            .click()
+  
+          cy.wait('@getStories')
+  
+          // Validamos e o dado contido no local storage do navegador é o último dado informado na pesquisa
+          cy.getLocalStorage('search')
+            .should('be.equal', newTerm)
+  
+          cy.get('.item').should('have.length', 2)
+          cy.get(`button:contains(${initialTerm})`)
+            .should('be.visible')
       })
 
       context('Last searches', () => {
@@ -373,13 +391,21 @@ describe('Hacker Stories', () => {
 
           // Comando para executar o mesmo conteúdo 6x
           Cypress._.times(6, () => {
+
+            // Variavel para armazenar a palavra randomica
+            const randomWork = faker.random.word()
+
             cy.get('#search')
               /* NÃO TEMOS UM .should('be.visible') PORQUE NÃO HOUVE REFRESH E JÁ FOI FEITO NO beforeEach */
               .clear()
-              .type(`${faker.random.word()}{enter}`)
+              .type(`${randomWork}{enter}`)
 
             // Coloco o wait aqui para ele aguardar o carregamento da página ao final de cada execução
             cy.wait('@getRandomStories')
+
+            // Validamos e o dado contido no local storage do navegador é o último dado informado na pesquisa
+            cy.getLocalStorage('search')
+            .should('be.equal', randomWork)
           })
 
           //cy.get('.last-searches button') - REFATORADO ABAIXO
