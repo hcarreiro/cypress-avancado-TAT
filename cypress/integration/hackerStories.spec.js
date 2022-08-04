@@ -382,8 +382,18 @@ describe('Hacker Stories', () => {
             cy.wait('@getRandomStories')
           })
 
-          cy.get('.last-searches button')
-            .should('have.length', 5)
+          //cy.get('.last-searches button') - REFATORADO ABAIXO
+          //.should('have.length', 5) - REFATORADO ABAIXO
+
+          // Damos um get na classe last-searches como classe pai
+          cy.get('.last-searches')
+            // Usamos a função de callback within para fazer uma busca dentro da classe
+            .within(() => {
+              // Damos um get em todos os botões dentro da classe pai
+              cy.get('button')
+                // E a quantidade de botões deve ser igual a 5
+                .should('have.length', 5)
+            })
         })
       })
     })
