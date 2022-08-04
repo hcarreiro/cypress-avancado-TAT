@@ -465,4 +465,26 @@ context('Errors', () => {
     cy.get(`p:contains(${errorMessage})`)
       .should('be.visible')
   })
+
+  it('shows a "Loading ..." state before showing the results', () => {
+
+    // Gero um cy.intercept com um delay de 2 segundos pra validar a mensagem de loading da tela
+    cy.intercept(
+      'GET',
+      '**/search**',
+      {
+        // Informo o delay e milisegundos
+        delay: 2000,
+        fixture: 'stories'
+      }
+    ).as('getDelayedStories')
+
+    cy.visit('/')
+    // Chamo o comando que vai verificar se o loading está visível e depois invisível
+    cy.assertLoadingIsShownAndHidden()
+    // Valido o resultado do mock
+    cy.wait('@getDelayedStories')
+    // Valido se temos os 2 itens na lista
+    cy.get('.item').should('have.length', 2)
+  })
 })
